@@ -1,0 +1,182 @@
+  /* General Body and Container Styles */
+  body {
+    background-color: #f3f4f6;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+main {
+    transition: margin-left 0.3s ease;
+}
+
+/* Header and Section Styling */
+header h1 {
+    color: #191970;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+section {
+    padding: 2.5rem;
+}
+
+.max-w-4xl {
+    background-color: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e5e7eb;
+}
+
+/* Tabbed Interface Styling */
+.tab-buttons {
+    display: flex;
+    justify-content: flex-start; /* Aligns tabs to the left */
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+.tab-button {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: 1px solid #d1d5db;
+    background-color: #e5e7eb;
+    color: #4b5563;
+    border-radius: 8px 8px 0 0;
+    margin-right: 5px;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+.tab-button.active {
+    background-color: #ffffff;
+    color: #1f2937;
+    border-color: #e5e7eb;
+    border-bottom: 1px solid #fff;
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+
+/* Search and Filter Section */
+.relative input[type="text"] {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #d1d5db;
+    transition: all 0.2s;
+}
+
+.relative input[type="text"]:focus {
+    outline: none;
+    border-color: #9ca3af;
+    box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.5);
+}
+
+.relative svg {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #9ca3af;
+}
+
+.bg-gray-200 {
+    background-color: #e5e7eb;
+    color: #374151;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.bg-gray-200:hover {
+    background-color: #d1d5db;
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    border-collapse: separate; /* Use separate to enable rounded corners */
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 1rem; /* Rounded corners for the entire table */
+}
+
+.table thead {
+    background-color: #3b82f6; /* A more vibrant blue header */
+    color: #ffffff;
+    font-weight: 600;
+}
+
+.table th, .table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.table th:first-child,
+.table td:first-child {
+    padding-left: 1.5rem;
+}
+
+.table th:last-child,
+.table td:last-child {
+    padding-right: 1.5rem;
+}
+
+.table tbody tr {
+    background-color: #ffffff;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.table .actions-cell {
+    text-align: center;
+}
+
+.table .actions-cell button {
+    background-color: #4f46e5;
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.table .actions-cell button:hover {
+    background-color: #4338ca;
+}
+/* Other styles */
+main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  section {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Allows the section to grow and take up remaining space */
+  }
+  /* Table container styling */
+.table-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1; /* Makes the container grow to fill available space */
+    overflow: hidden; /* Prevents overflow */
+}
+
+/* Table body for scrolling */
+.table-body-scroll {
+    flex-grow: 1; /* Makes the scrollable body take up remaining space */
+    overflow-y: auto; /* Adds a scrollbar when content overflows */
+}

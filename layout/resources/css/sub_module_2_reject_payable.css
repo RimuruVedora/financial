@@ -1,0 +1,17 @@
+.dashboard-card {
+    background: linear-gradient(135deg, #ffffff, #f9fafb);
+    border-left: 4px solid #3b82f6;
+}
+.view-button {
+    transition: all 0.3s ease;
+}
+.view-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}

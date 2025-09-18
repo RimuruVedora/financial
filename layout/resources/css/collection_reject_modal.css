@@ -1,0 +1,149 @@
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.hidden {
+    display: none;
+}
+
+.modal-container {
+    background-color: #e5e7eb;
+    border: 2px solid #000;
+    border-radius: 1rem;
+    width: 400px;
+    max-width: 90%;
+    position: relative;
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.modal-header {
+    background-color: #1f2937;
+    color: #fff;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header span {
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.modal-close-button {
+    cursor: pointer;
+    font-size: 5rem;
+    line-height: 1;
+    padding: 0 0.5rem;
+    transition: transform 0.2s ease;
+}
+
+.modal-close-button:hover {
+    transform: scale(1.2);
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+}
+
+.modal-item {
+    display: flex;
+    align-items: center;
+    padding-left: 1rem;
+}
+
+.modal-label {
+    font-weight: normal;
+    width: 120px;
+    text-align: left;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+#modalName,
+#modalRevenue,
+#modalType,
+#modalDate,
+#modalResubmittedDate,
+#modalTime,
+#modalFileType {
+    color: #1f2937;
+    font-size: 0.9rem;
+}
+
+
+.modal-file-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    margin-bottom: 0rem; /* Adjusted for less space */
+}
+
+.modal-pdf-button {
+    width: 100%;
+    background-color: #9ca3af;
+    color: #ffffff;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    margin-top: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.modal-pdf-button:hover {
+    background-color: #86efac; /* Green background on hover */
+    color: #1f2937; /* Black text on hover */
+}
+
+.modal-footer {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0rem; /* Adjusted for less space */
+    padding-top: 1rem;
+}
+
+.modal-approve-button {
+    background-color: #86efac;
+    color: #1f2937;
+    border: 2px solid #000;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    flex-grow: 1;
+    font-size: 1rem;
+}
+
+.modal-reject-button {
+    background-color: #f87171;
+    color: #1f2937;
+    border: 2px solid #000;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    flex-grow: 1;
+    font-size: 1rem;
+}

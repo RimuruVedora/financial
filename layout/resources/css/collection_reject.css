@@ -1,0 +1,143 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+}
+.container {
+    max-width: 960px;
+}
+.total-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    padding: 0 20px;
+    border-radius: 9999px;
+    font-weight: bold;
+    color: #1f2937;
+    border: 2px solid #000;
+}
+.total-update {
+    background-color: #dcfce7;
+    border-color: #86efac;
+    color: #1f2937;
+}
+.total-rejected {
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
+    color: #1f2937;
+}
+.icon {
+    margin-right: 8px;
+}
+.table-row-container {
+    border-radius: 1rem;
+    border: 2px solid #000;
+    background-color: #e5e7eb;
+}
+.table-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 1rem;
+    align-items: center;
+    border-bottom: 2px solid #000;
+}
+.table-row:last-child {
+    border-bottom: none;
+}
+.status-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 30px;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    border: 2px solid #000;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    background-color: #3b82f6;
+    color: #fff;
+}
+.status-button:hover {
+    transform: scale(1.05);
+}
+.search-container {
+    display: flex;
+    align-items: center;
+    border: 2px solid #000;
+    border-radius: 9999px;
+    background-color: #fff;
+    padding: 0 1rem;
+    height: 40px;
+}
+.search-container input {
+    border: none;
+    outline: none;
+    background: transparent;
+}
+.search-container svg {
+    color: #6b7280;
+}
+.incoming-revenue-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 2px solid #000;
+    background-color: #e5e7eb;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1f2937;
+}
+.header-bg {
+    background-color: #d1d5db;
+}
+.dropdown {
+    position: relative;
+}
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 10;
+    display: none;
+    min-width: 150px;
+    background-color: #fff;
+    border: 2px solid #000;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+.dropdown-menu a {
+    display: block;
+    padding: 0.75rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.dropdown-menu a:hover {
+    background-color: #f3f4f6;
+}
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.status-badge.updated {
+    background-color: #dcfce7;
+    color: #1f2937;
+    border: 2px solid #86efac;
+}
+.status-badge.cancelled {
+    background-color: #fee2e2;
+    color: #1f2937;
+    border: 2px solid #f87171;
+}
+.status-badge.rejected {
+    background-color: #e5e7eb;
+    color: #1f2937;
+    border: 2px solid #9ca3af;
+}

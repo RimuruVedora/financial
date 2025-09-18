@@ -1,0 +1,517 @@
+function fetchData() {
+    fetch('php/sub_module_2_payable_backend.php')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                const payables = data.data;
+
+                // Update summary dashboard cards
+                if (payables.summary) {
+                    document.getElementById('total-payable').textContent = `$${parseFloat(payables.summary.total_payable).toFixed(2)}`;
+                    document.getElementById('employee-cost').textContent = `$${parseFloat(payables.summary.employee_cost).toFixed(2)}`;
+                    document.getElementById('vendor-cost').textContent = `$${parseFloat(payables.summary.vendor_cost).toFixed(2)}`;
+                    // Now using unique IDs for requests
+                    document.getElementById('employee-requests').textContent = `${payables.summary.total_employee_requests}`;
+                    document.getElementById('vendor-requests').textContent = `${payables.summary.total_vendor_requests}`;
+                }
+
+                // Populate employee table
+                const employeeTableBody = document.getElementById('records-table-body-employee');
+                employeeTableBody.innerHTML = '';
+                if (payables.employee_payables.length > 0) {
+                    payables.employee_payables.forEach(row => {
+                        const newRow = document.createElement('tr');
+                        newRow.setAttribute('data-employee', JSON.stringify(row));
+                        newRow.innerHTML = `
+                            <td>${row.Employee_ID}</td>
+                            <td>${row.First_Name || ''} ${row.Last_Name || 'N/A'}</td>
+                            <td>$${parseFloat(row.Requested_Amount).toFixed(2)}</td>
+                            <td>${row.Due_Date || 'N/A'}</td>
+                            <td>${row.priority || 'N/A'}</td>
+                            <td class="actions-cell">
+                                <button onclick="showModal('employee', this)">Review</button>
+                            </td>
+                        `;
+                        employeeTableBody.appendChild(newRow);
+                    });
+                } else {
+                    const noRecordsRow = document.createElement('tr');
+                    noRecordsRow.innerHTML = `<td colspan="6" class="text-center">No employee records found.</td>`;
+                    employeeTableBody.appendChild(noRecordsRow);
+                }
+
+                // Populate vendor table
+                const vendorTableBody = document.getElementById('records-table-body-vendor');
+                vendorTableBody.innerHTML = '';
+                if (payables.vendor_payables.length > 0) {
+                    payables.vendor_payables.forEach(row => {
+                        const newRow = document.createElement('tr');
+                        newRow.setAttribute('data-vendor', JSON.stringify(row));
+                        newRow.innerHTML = `
+                            <td>${row.Vendor_ID}</td>
+                            <td>${row.Company_Name || 'N/A'}</td>
+                            <td>$${parseFloat(row.Request_Amount).toFixed(2)}</td>
+                            <td>${row.Due_Date || 'N/A'}</td>
+                            <td>${row.priority || 'N/A'}</td>
+                            <td class="actions-cell">
+                                <button onclick="showModal('vendor', this)">Review</button>
+                            </td>
+                        `;
+                        vendorTableBody.appendChild(newRow);
+                    });
+                } else {
+                    const noRecordsRow = document.createElement('tr');
+                    noRecordsRow.innerHTML = `<td colspan="6" class="text-center">No vendor records found.</td>`;
+                    vendorTableBody.appendChild(noRecordsRow);
+                }
+                
+            } else {
+                console.error('Backend Error:', data.message);
+                const tableBodies = ['records-table-body-employee', 'records-table-body-vendor'];
+                tableBodies.forEach(id => {
+                    const tableBody = document.getElementById(id);
+                    if (tableBody) {
+                        tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-red-500">Error loading data.</td></tr>`;
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            const tableBodies = ['records-table-body-employee', 'records-table-body-vendor'];
+            tableBodies.forEach(id => {
+                const tableBody = document.getElementById(id);
+                if (tableBody) {
+                    tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-red-500">Error loading data.</td></tr>`;
+                }
+            });
+        });
+}
+
+// Call the function to load data when the page loads
+window.onload = fetchData;
+
+function showTab(tabName, element) {
+    // Hide all tab contents
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    // Remove active class from all buttons
+    document.querySelectorAll('.tab-button').forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show the selected tab content and add active class to the clicked button
+    document.getElementById(tabName + '-tab').classList.add('active');
+    element.classList.add('active');
+
+    // Update the dashboard title based on the selected tab
+    const dashboardTitle = document.getElementById('dashboard-title');
+    const companyFilterContainer = document.getElementById('company-filter-container');
+
+
+    // Title ng Dashboard
+    if (tabName === 'employee') {
+        dashboardTitle.textContent = "Payable Dashboard: Employee Only";
+    } else if (tabName === 'vendor') {
+        dashboardTitle.textContent = "Payable Dashboard: Supplier Only";
+    }
+}
+
+function showModal(type, button) {
+    const row = button.closest('tr');
+    
+    // Determine which modal to show based on type
+    if (type === 'vendor') {
+        const vendorData = JSON.parse(row.getAttribute('data-vendor'));
+        const modal = document.getElementById('vendor-modal');
+        
+        // Populate the modal with the vendor's information
+        modal.querySelector('p:nth-child(1) strong').textContent = `Vendor Name: ${vendorData.First_Name || ''} ${vendorData.Last_Name || ''}`;
+        modal.querySelector('p:nth-child(2) strong').textContent = `Company Name: ${vendorData.Company_Name || 'N/A'}`;
+        modal.querySelector('p:nth-child(3) strong').textContent = `Contact number: ${vendorData.contact_number || 'N/A'}`;
+        modal.querySelector('p:nth-child(4) strong').textContent = `Email: ${vendorData.Email || 'N/A'}`;
+        modal.querySelector('p:nth-child(5) strong').textContent = `Company Address: ${vendorData.Address || 'N/A'}`;
+        modal.querySelector('p:nth-child(6) strong').textContent = `Amount Requested: $${parseFloat(vendorData.Request_Amount).toFixed(2)}`;
+        modal.querySelector('p:nth-child(7) strong').textContent = `Due date: ${vendorData.Due_Date || 'N/A'}`;
+        modal.querySelector('p:nth-child(8) strong').textContent = `Payment Method: ${vendorData.payment_method || 'N/A'}`;
+        modal.querySelector('p:nth-child(9) strong').textContent = `Purpose: ${vendorData.purpose || 'N/A'}`;
+        modal.querySelector('#vendor-priority-badge').textContent = `Priority ${vendorData.priority || 'N/A'}`;
+
+        // Show the modal
+        modal.classList.add('is-visible');
+    } else if (type === 'employee') {
+        const employeeData = JSON.parse(row.getAttribute('data-employee'));
+        const modal = document.getElementById('employee-modal');
+
+        // Populate the modal with the employee's information
+        modal.querySelector('p:nth-child(1) strong').textContent = `Employee Name: ${employeeData.First_Name || ''} ${employeeData.Last_Name || ''}`;
+        modal.querySelector('p:nth-child(2) strong').textContent = `Job Title: ${employeeData.Job_Tittle || 'N/A'}`;
+        modal.querySelector('p:nth-child(3) strong').textContent = `Department ID: ${employeeData.department_id || 'N/A'}`;
+        modal.querySelector('p:nth-child(4) strong').textContent = `Email: ${employeeData.Email || 'N/A'}`;
+        modal.querySelector('p:nth-child(5) strong').textContent = `Address: ${employeeData.Address || 'N/A'}`;
+        modal.querySelector('p:nth-child(6) strong').textContent = `Amount Requested: $${parseFloat(employeeData.Requested_Amount).toFixed(2)}`;
+        modal.querySelector('p:nth-child(7) strong').textContent = `Due date: ${employeeData.Due_Date || 'N/A'}`;
+        modal.querySelector('p:nth-child(8) strong').textContent = `Payment Method: ${employeeData.payment_method || 'N/A'}`;
+        modal.querySelector('p:nth-child(9) strong').textContent = `Justification: ${employeeData.justification || 'N/A'}`;
+        modal.querySelector('p:nth-child(10) strong').textContent = `Status: ${employeeData.Payable_Status}`;
+        modal.querySelector('#employee-priority-badge').textContent = `Priority ${employeeData.priority || 'N/A'}`;
+
+
+        // Show the modal
+        modal.classList.add('is-visible');
+    }
+}
+
+function hideModal(type) {
+    document.getElementById(type + '-modal').classList.remove('is-visible');
+}
+
+function changeText(element, text) {
+    element.querySelector('span').textContent = text;
+}
+
+function showFilterModal(tabType) {
+    const companyFilterContainer = document.getElementById('company-filter-container');
+    if (tabType === 'employee') {
+        companyFilterContainer.classList.add('hidden');
+    } else {
+        companyFilterContainer.classList.remove('hidden');
+    }
+    document.getElementById('filter-modal').classList.remove('hidden');
+}
+
+function hideFilterModal() {
+    document.getElementById('filter-modal').classList.add('hidden');
+}
+
+function applyFilter() {
+    // Implement your filtering logic here.
+    // Get the selected values from the dropdowns:
+    const dateOrder = document.getElementById('date-filter').value;
+    const timeOrder = document.getElementById('time-filter').value;
+    const companyName = document.getElementById('company-filter').value;
+    
+    console.log('Applying filters:', { dateOrder, timeOrder, companyName });
+    
+    // After applying the filters, you would typically refresh the table data.
+    // For now, we will just hide the modal.
+    hideFilterModal();
+}
+
+function filterTable(tabName) {
+    const searchInput = document.getElementById(tabName + '-search');
+    const filter = searchInput.value.toLowerCase();
+    const tableBody = document.getElementById('records-table-body-' + tabName);
+    const rows = tableBody.getElementsByTagName('tr');
+    
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        const cells = row.getElementsByTagName('td');
+        let found = false;
+        for (let j = 0; j < cells.length; j++) {
+            const cellText = cells[j].textContent.toLowerCase();
+            if (cellText.includes(filter)) {
+                found = true;
+                break;
+            }
+        }
+        if (found) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    }
+}
+
+<?php
+// Your existing PHP code for includes, if any.
+// The main backend logic has been moved to a separate file.
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payable Dashboard</title>
+    <link rel="stylesheet" href="layout/resources/css/payable_table.css">
+    <link rel="stylesheet" href="layout/resources/css/payable_modal.css">
+    <link rel="stylesheet" href="layout/resources/css/sidebar.css">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+<?php include 'layout/sidebar.php'; ?>
+<script src="layout/resources/js/sidebar.js"></script>
+
+<main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 transition-slow mx-auto w-full max-w-6xl">
+    <header class="flex flex-col md:flex-row justify-between items-center pb-5 border-b border-gray-300 animate-fadeIn">
+        <h1 id="dashboard-title" class="text-2xl font-bold text-[#191970]">Payable Dashboard: Employee Only</h1>
+    </header>
+
+    <section class="p-5">
+        <div class="flex justify-center items-center">
+            <div class="w-full max-w-4xl p-6 bg-white rounded-2xl shadow-xl border border-gray-200">
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="showTab('employee', this)">Employee</button>
+                    <button class="tab-button" onclick="showTab('vendor', this)">Vendor</button>
+                </div>
+
+                <div id="employee-tab" class="tab-content active">
+                    <div class="overflow-x-auto shadow-lg rounded-xl">
+                 
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-yellow-100 p-4 rounded-xl shadow-md text-center">
+        <h3 class="text-lg font-semibold text-yellow-800">total Payable</h3>
+        <p class="text-2xl font-bold text-yellow-900 mt-2" id="total-payable">
+            <span class="flex items-end justify-center gap-1">
+                <i class='bx bx-coin text-3xl text-yellow-900'></i>₱12,000
+            </span>
+        </p>
+    </div>
+    <div class="bg-orange-200 p-4 rounded-xl shadow-md text-center">
+        <h3 class="text-lg font-semibold text-orange-800">Employee's Payable Cost</h3>
+        <p class="text-2xl font-bold text-orange-900 mt-2" id="employee-cost">
+            <span class="flex items-end justify-center gap-1">
+                <i class='bx bx-money text-3xl text-orange-900'></i>₱3,000
+            </span>
+        </p>
+    </div>
+    <div class="bg-amber-300 p-4 rounded-xl shadow-md text-center">
+        <h3 class="text-lg font-semibold text-amber-800">Total Requests</h3>
+        <p class="text-2xl font-bold text-amber-900 mt-2" id="employee-requests">
+            <span class="flex items-end justify-center gap-1">
+                <i class='bx bx-file-blank text-3xl text-amber-900'></i>25
+            </span>
+        </p>
+    </div>
+</div>
+<header class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                        <div class="relative w-full sm:w-1/2">
+                            <input type="text" id="employee-search" onkeyup="filterTable('employee')" placeholder="Search..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                        <button onclick="showFilterModal('employee')" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-semibold hover:bg-gray-300 transition-colors duration-200">
+                            filter
+                        </button>
+                    </header>
+                        <table class="table w-full">
+                            <thead>
+                                <tr class="bg-primary text-primary-content">
+                                    <th>No#</th>
+                                    <th>Name</th>
+                                    <th>Requested Amount</th>
+                                    <th>Due Date</th>
+                                    <th>Priority</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-table-body-employee">
+                             
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="no-records-message-employee" class="text-center mt-8 text-gray-500 hidden">
+                        <p>No records found. Please add a new record to get started.</p>
+                    </div>
+                </div>
+
+                <div id="vendor-tab" class="tab-content">
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-yellow-100 p-4 rounded-xl shadow-md text-center">
+        <h3 class="text-lg font-semibold text-yellow-800">total Payable</h3>
+        <p class="text-2xl font-bold text-yellow-900 mt-2" id="total-payable">
+            <span class="flex items-end justify-center gap-1">
+                <i class='bx bx-coin text-3xl text-yellow-900'></i>₱12,000
+            </span>
+        </p>
+    </div>
+    <div class="bg-orange-200 p-4 rounded-xl shadow-md text-center">
+        <h3 class="text-lg font-semibold text-orange-800">Supplier's Payable Cost</h3>
+        <p class="text-2xl font-bold text-orange-900 mt-2" id="vendor-cost">
+            <span class="flex items-end justify-center gap-1">
+                <i class='bx bx-money text-3xl text-orange-900'></i>₱9,000
+            </span>
+        </p>
+    </div>
+    <div class="bg-amber-300 p-4 rounded-xl shadow-md text-center">
+        <h3 class="text-lg font-semibold text-amber-800">Total Requests</h3>
+        <p class="text-2xl font-bold text-amber-900 mt-2" id="vendor-requests">
+            <span class="flex items-end justify-center gap-1">
+                <i class='bx bx-file-blank text-3xl text-amber-900'></i>25
+            </span>
+        </p>
+    </div>
+</div>
+             
+                           <header class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+                        <div class="relative w-full sm:w-1/2">
+                            <input type="text" id="vendor-search" onkeyup="filterTable('vendor')" placeholder="Search..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                        <button onclick="showFilterModal('vendor')" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl font-semibold hover:bg-gray-300 transition-colors duration-200">
+                            filter
+                        </button>
+                    </header>
+                    <div class="overflow-x-auto shadow-lg rounded-xl">
+                        <table class="table w-full">
+                            <thead>
+                                <tr class="bg-primary text-primary-content">
+                                    <th>ID</th>
+                                    <th>Company Name</th>
+                                    <th>Requested Amount</th>
+                                    <th>Due Date</th>
+                                    <th>Priority</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="records-table-body-vendor">
+                                </tbody>
+                        </table>
+                    </div>
+                    <div id="no-records-message-vendor" class="text-center mt-8 text-gray-500 hidden">
+                        <p>No records found. Please add a new record to get started.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div id="employee-modal" class="modal-backdrop">
+    <div class="modal-container">
+        <button class="modal-close-btn" onclick="hideModal('employee')">&times;</button>
+        <div class="modal-content">
+            <div class="modal-header flex items-center justify-between">
+                <img src="layout/resources/images/sample.png" alt="Employee Image" class="modal-image">
+                <div class="flex flex-col gap-2">
+                    <span id="employee-priority-badge" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500 text-white">
+                        High
+                    </span>
+                    <span id="employee-status-badge" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500 text-white">
+                    allocated status:
+                    </span>
+                </div>
+            </div>
+            <div class="modal-content-details">
+                <p><strong>Employee Name</strong></p>
+                <p><strong>Position</strong></p>
+                <p><strong>Department</strong></p>
+                <p><strong>Age</strong></p>
+                <p><strong>Contact number</strong></p>
+                <p><strong>Email</strong></p>
+                <p><strong>Gender</strong></p>
+                <p><strong>Amount Requested</strong></p>
+                <p><strong>Due date</strong></p>
+                <p><strong>Payment Method</strong></p>
+            </div>
+            <div class="pdf-uploaded-btn" onmouseover="changeText(this, 'Click to Download')" onmouseout="changeText(this, 'pdf uploaded')">
+                <span>pdf uploaded</span>
+            </div>
+            <div class="modal-actions">
+                <button class="approve-btn">approve</button>
+                <button class="reject-btn">reject</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="vendor-modal" class="modal-backdrop">
+    <div class="modal-container">
+        <button class="modal-close-btn" onclick="hideModal('vendor')">&times;</button>
+        <div class="modal-content">
+            <div class="modal-header">
+                <img src="layout/resources/images/sample.png" alt="Vendor Image" class="modal-image">
+                <div class="flex flex-col gap-2">
+                    <span id="employee-priority-badge" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-500 text-white">
+                        High
+                    </span>
+                    <span id="employee-status-badge" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-500 text-white">
+                        allocated status:
+                    </span>
+                </div>
+            </div>
+            <div class="modal-content-details">
+                <p><strong>Vendor Name</strong></p>
+                <p><strong>Company Name</strong></p>
+                <p><strong>Cost Center</strong></p>
+
+                <p><strong>Contact number</strong></p>
+                <p><strong>Email</strong></p>
+                <p><strong>Company Address</strong></p>
+                <p><strong>Amount Requested</strong></p>
+                <p><strong>Time stamp</strong></p>
+                <p><strong>Due date</strong></p>
+                <p><strong>Payment Method</strong></p>
+            </div>
+            <div class="pdf-uploaded-btn" onmouseover="changeText(this, 'Click to Download')" onmouseout="changeText(this, 'pdf uploaded')">
+                <span>pdf uploaded</span>
+            </div>
+            <div class="modal-actions">
+                <button class="approve-btn">approve</button>
+                <button class="reject-btn">reject</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="filter-modal" class="modal-backdrop hidden">
+    <div class="modal-container">
+        <div class="modal-content">
+            <h2 class="text-xl font-bold mb-4">Filter Options</h2>
+            <div class="flex flex-col gap-4">
+                <div>
+                    <label for="date-filter" class="block text-sm font-medium text-gray-700">Sort by Date</label>
+                    <select id="date-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-gray-400 focus:border-gray-400 sm:text-sm rounded-md">
+                        <option value="">Select Option</option>
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="time-filter" class="block text-sm font-medium text-gray-700">Sort by Time</label>
+                    <select id="time-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-gray-400 focus:border-gray-400 sm:text-sm rounded-md">
+                        <option value="">Select Option</option>
+                        <option value="asc">Ascending</option>
+                        <option value="desc">Descending</option>
+                    </select>
+                </div>
+                <div id="company-filter-container" class="hidden">
+                    <label for="company-filter" class="block text-sm font-medium text-gray-700">Company Name</label>
+                    <select id="company-filter" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-gray-400 focus:border-gray-400 sm:text-sm rounded-md">
+                        <option value="">Select Company</option>
+                        <option value="Tech Solutions Inc.">Tech Solutions Inc.</option>
+                        <option value="Global Innovations">Global Innovations</option>
+                        </select>
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-2">
+                <button onclick="hideFilterModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors duration-200">
+                    Close
+                </button>
+                <button onclick="applyFilter()" class="px-4 py-2 bg-[#191970] text-white rounded-xl font-semibold hover:bg-[#191970]/90 transition-colors duration-200">
+                    Apply Filter
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="layout/resources/js/payable.js"></script>
+
+</body>
+</html>
+
